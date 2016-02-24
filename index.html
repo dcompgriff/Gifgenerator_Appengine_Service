@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+{% autoescape true %}
+
+<html>
+<head></head>
+<body>
+
+<h1>Weird Multi-App Web Page</h1>
+
+<h2>App 1</h2>
+<p>Description</p>
+
+<div>
+	<input id="sumSqNum" name="sumSqNum" value="0" style="text-align: right" />
+	<button id="sumSqNumButton" name="sumSqNumButton" >get Sum Sequence Squared</button>
+	<label for="sumSqResult" value="Result" />
+	<p id="sumSqResult">Result</p>
+<div>
+
+
+<script src="https://code.jquery.com/jquery-2.2.1.min.js"></script>
+<script>
+$(document).ready(function(){
+
+	$("#sumSqNumButton").click(function(){
+		var sumSqNum = $("#sumSqNum").val();
+		$.get("/sumsqnum/", function(data){
+			$("#sumSqResult").text(data);
+		});
+
+	});
+
+});
+
+
+</script>
+
+</body>
+</html>
+{% endautoescape %}
