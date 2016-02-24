@@ -17,6 +17,15 @@
 	<p id="sumSqResult">Result</p>
 <div>
 
+<h2>App 2</h2>
+<p>Description</p>
+
+<div style="margin: 1em">
+	<input id="imageTerm" name="imageTerm" value="flower" style="text-align: right" />
+	<button id="imageTermButton" name="imageTermButton" >Get Image</button>
+<div>
+<div id="imageResult">
+</div>
 
 <script src="https://code.jquery.com/jquery-2.2.1.min.js"></script>
 <script>
@@ -27,7 +36,13 @@ $(document).ready(function(){
 		$.get("/sumsqnum/" + sumSqNum, function(data){
 			$("#sumSqResult").text(data);
 		});
+	});
 
+	$("#imageTermButton").click(function(){
+		var imageTerm = $("#imageTerm").val();
+		$.get("/termimage/" + imageTerm, function(data){
+			$("#imageResult").text(data);
+		});
 	});
 
 });

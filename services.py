@@ -14,13 +14,19 @@ class MainPage(webapp2.RequestHandler):
 class SumSquaredSequence(webapp2.RequestHandler):
 	def get(self, numToSqStr):
 
-		numToSq = long(numToSqStr)		
+		numToSq = long(numToSqStr)
+		if numToSq > 10000000000000:
+			numToSq = 10000000000000	
 
 		self.response.write("Called sum squared text: " + str(numToSq))
 		
+class TermImage(webapp2.RequestHandler):
+	def get(self, term):
+		self.response.write("Received Term: " + str(term))
 
 
 app = webapp2.WSGIApplication([
     (r'/', MainPage),
 	(r'/sumsqnum/(\d+)', SumSquaredSequence),
+	(r'/termimage/([a-z]+)', TermImage),
 ], debug=True)
