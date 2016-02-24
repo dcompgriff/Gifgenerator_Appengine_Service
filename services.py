@@ -1,7 +1,7 @@
 import webapp2
 import jinja2
 import os
-import urllib
+from google.appengine.api import urlfetch
 
 JINJA_ENVIRONMENT = jinja2.Environment(loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),extensions=['jinja2.ext.autoescape'], autoescape=True)
 
@@ -22,7 +22,14 @@ class SumSquaredSequence(webapp2.RequestHandler):
 		
 class TermImage(webapp2.RequestHandler):
 	def get(self, term):
-		self.response.write("Received Term: " + str(term))
+		pre_base_string = "https://www.google.com/search?q="
+		post_base_string = "&tbm=isch&tbo=u&source=univ&sa=X&ved=0ahUKEwiq6JvAq5HLAhXJOD4KHcjmCiwQsAQIMw&biw=1366&bih=635"
+
+		#Fetch the image url for the data.
+		url = pre_base_string + term + post_base_string
+		result = urlfetch.fetch(url)
+
+		self.response.write(str(result.content))
 
 
 app = webapp2.WSGIApplication([
