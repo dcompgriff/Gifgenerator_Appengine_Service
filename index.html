@@ -20,11 +20,12 @@
 <h2>App 2</h2>
 <p>Description</p>
 
-<div style="margin: 1em">
+<div style="margin: 1em" style="display: block">
 	<input id="imageTerm" name="imageTerm" value="flower" style="text-align: right" />
 	<button id="imageTermButton" name="imageTermButton" >Get Image</button>
-<div>
-<div id="imageResult">
+</div>
+<div id="imageResult" style="display: block">
+
 </div>
 
 <script src="https://code.jquery.com/jquery-2.2.1.min.js"></script>
@@ -41,7 +42,21 @@ $(document).ready(function(){
 	$("#imageTermButton").click(function(){
 		var imageTerm = $("#imageTerm").val();
 		$.get("/termimage/" + imageTerm, function(data){
-			$("#imageResult").text(data);
+			//Clear the gif holder.			
+			$("#imageResult").empty();
+			//Get the first gif url for the term.
+			var jsonData = JSON.parse(data);
+			var gifIndex = Math.floor((Math.random() * (jsonData.data.length)));
+			if(jsonData.data.length > 0){
+				var imageUrl = jsonData.data[gifIndex].images.fixed_height.url
+				//$("#imageResult").text(JSON.stringify(jsonData.data));
+				//Make a new element to hold the gif.
+				termImage = document.createElement("img");
+				$(termImage).attr("src", imageUrl);
+				$("#imageResult").append(termImage);
+			}else{
+				$("#imageResult").text("No Gifs Found");
+			};
 		});
 	});
 

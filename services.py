@@ -22,11 +22,18 @@ class SumSquaredSequence(webapp2.RequestHandler):
 		
 class TermImage(webapp2.RequestHandler):
 	def get(self, term):
-		pre_base_string = "https://www.google.com/search?q="
-		post_base_string = "&tbm=isch&tbo=u&source=univ&sa=X&ved=0ahUKEwiq6JvAq5HLAhXJOD4KHcjmCiwQsAQIMw&biw=1366&bih=635"
+		pre_base_string = "http://api.giphy.com/v1/gifs/search?q="
+		post_base_string = "&api_key=dc6zaTOxFJmzC"
+
+		lowerCaseTerm = term.lower()
+		lowerTermList = lowerCaseTerm.split()
+		newStrTerm = ""
+		for newStr in lowerTermList:
+			newStrTerm += newStr
+		newStrTerm = newStrTerm[0:-1]
 
 		#Fetch the image url for the data.
-		url = pre_base_string + term + post_base_string
+		url = pre_base_string + newStrTerm + post_base_string
 		result = urlfetch.fetch(url)
 
 		self.response.write(str(result.content))
@@ -35,5 +42,5 @@ class TermImage(webapp2.RequestHandler):
 app = webapp2.WSGIApplication([
     (r'/', MainPage),
 	(r'/sumsqnum/(\d+)', SumSquaredSequence),
-	(r'/termimage/([a-z]+)', TermImage),
+	(r'/termimage/([a-z|A-Z]+)', TermImage),
 ], debug=True)
