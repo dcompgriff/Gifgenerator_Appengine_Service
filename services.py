@@ -12,12 +12,15 @@ class MainPage(webapp2.RequestHandler):
 		self.response.write(template.render(template_values))
 
 class SumSquaredSequence(webapp2.RequestHandler):
-	def get(self):
-		self.response.write("Called sum squared text")
+	def get(self, numToSqStr):
+
+		numToSq = long(numToSqStr)		
+
+		self.response.write("Called sum squared text: " + str(numToSq))
 		
 
 
 app = webapp2.WSGIApplication([
     (r'/', MainPage),
-	(r'/sumsqnum/', SumSquaredSequence),
+	(r'/sumsqnum/(\d+)', SumSquaredSequence),
 ], debug=True)
