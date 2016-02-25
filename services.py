@@ -1,7 +1,10 @@
 import webapp2
 import jinja2
 import os
+import random
+import json
 from google.appengine.api import urlfetch
+from google.appengine.api import memcache
 
 JINJA_ENVIRONMENT = jinja2.Environment(loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),extensions=['jinja2.ext.autoescape'], autoescape=True)
 
@@ -10,15 +13,6 @@ class MainPage(webapp2.RequestHandler):
 		template = JINJA_ENVIRONMENT.get_template('index.html')
 		template_values = {}
 		self.response.write(template.render(template_values))
-
-class SumSquaredSequence(webapp2.RequestHandler):
-	def get(self, numToSqStr):
-
-		numToSq = long(numToSqStr)
-		if numToSq > 10000000000000:
-			numToSq = 10000000000000	
-
-		self.response.write("Called sum squared text: " + str(numToSq))
 		
 class TermImage(webapp2.RequestHandler):
 	def get(self, term):
@@ -32,15 +26,31 @@ class TermImage(webapp2.RequestHandler):
 			newStrTerm += newStr
 		newStrTerm = newStrTerm[0:-1]
 
-		#Fetch the image url for the data.
-		url = pre_base_string + newStrTerm + post_base_string
-		result = urlfetch.fetch(url)
+		#Check memcache for image url.
+		client = memcache.Client()
+		strCachedUrl = client.get(newStrTerm)
+		if strCachedUrl is not None:
+			returnObject = {"url": strCachedUrl}
+			self.response.write(json.dumps(returnObject))	
+		else:				
+			#Fetch the image url for the data.
+			url = pre_base_string + newStrTerm + post_base_string
+			result = urlfetch.fetch(url)
 
-		self.response.write(str(result.content))
+			#Store the url in memcache.
+			returnObject = {"url": ""}
+			giphyObject = json.loads(str(result.content))
+			if len(giphyObject["data"]) == 0:
+				client.add(newStrTerm, "", 60)
+				self.response.write(json.dumps(returnObject))
+			else:
+				imageIndex = random.randint(0, len(giphyObject["data"]) - 1)
+				returnObject["url"] = giphyObject["data"][imageIndex]["images"]["fixed_height"]["url"]
+				client.add(newStrTerm, returnObject["url"], 60)
+				self.response.write(json.dumps(returnObject))
 
 
 app = webapp2.WSGIApplication([
     (r'/', MainPage),
-	(r'/sumsqnum/(\d+)', SumSquaredSequence),
 	(r'/termimage/([a-z|A-Z]+)', TermImage),
 ], debug=True)
